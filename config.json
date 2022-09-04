@@ -1,0 +1,11 @@
+{
+    "config": {
+        "gaming": true,
+        "games": {
+            "steam": true,
+            "proton": true,
+            "yuzu": false,
+            "retroArch": false
+        }
+    }
+}

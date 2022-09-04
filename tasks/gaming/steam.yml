@@ -1,0 +1,7 @@
+- name: Install Steam
+  tags: &tags_steam [ 'gaming', 'steam' ]
+  become: true
+  apt:
+    update_cache: yes
+    name: steam
+  when: '"steam" not in ansible_facts.packages'

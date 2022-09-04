@@ -1,0 +1,27 @@
+- hosts: localhost
+  pre_tasks:
+    - apt:
+        state: latest
+        update_cache: true
+        upgrade: true
+      become: true
+      name: "Update and upgrade"
+      tags:
+        - install
+        - core
+  tasks:
+    # Read and set variables from config
+    - include_tasks: tasks/read-set-config.yml
+    # Games and emulators
+    - name: Proton-GE
+      include_tasks: tasks/gaming/proton-ge.yml
+      when: cfg_gaming == True and cfg_proton == True
+    - name: RetroArch
+      include_tasks: tasks/gaming/retroArch.yml
+      when: cfg_gaming == True and cfg_retroArch == True
+    - name: Steam
+      include_tasks: tasks/gaming/steam.yml
+      when: cfg_gaming == True and cfg_steam == True
+    - name: YUZU
+      include_tasks: tasks/gaming/yuzu.yml
+      when: cfg_gaming == True and cfg_yuzu == True
