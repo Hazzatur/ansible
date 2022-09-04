@@ -12,6 +12,11 @@
   tasks:
     # Read and set variables from config
     - include_tasks: tasks/read-set-config.yml
+    # Core
+    # Apps
+    - name: Opera browser
+      include_tasks: tasks/apps/opera.yml
+      when: cfg_apps == True and cfg_opera == True
     # Games and emulators
     - name: Proton-GE
       include_tasks: tasks/gaming/proton-ge.yml
