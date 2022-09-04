@@ -1,78 +1,74 @@
-- name: Add mesa repo (Proton-GE)
+- name: Install Protong-GE and dependencies
   tags: &tags_proton_ge [ 'gaming', 'proton' ]
-  become: true
-  ansible.builtin.apt_repository:
-    repo: ppa:kisak/kisak-mesa
+  block:
+    - name: Add mesa repo (Proton-GE)
+      become: true
+      ansible.builtin.apt_repository:
+        repo: ppa:kisak/kisak-mesa
 
-- name: Add i386 architecture (Proton-GE)
-  tags: *tags_proton_ge
-  become: true
-  shell: |
-    dpkg --add-architecture i386
+    - name: Add i386 architecture (Proton-GE)
+      become: true
+      shell: |
+        dpkg --add-architecture i386
 
-- name: Install dependencies (Proton-GE)
-  tags: *tags_proton_ge
-  become: true
-  apt:
-    update_cache: yes
-    name: ["jq", "libgl1-mesa-dri:i386", "mesa-vulkan-drivers", "mesa-vulkan-drivers:i386"]
+    - name: Install dependencies (Proton-GE)
+      become: true
+      apt:
+        update_cache: yes
+        name: ["jq", "libgl1-mesa-dri:i386", "mesa-vulkan-drivers", "mesa-vulkan-drivers:i386"]
 
-- name: Get assets (Proton-GE)
-  tags: *tags_proton_ge
-  get_url:
-    url: "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest"
-    force: yes
-    headers:
-      Accept: "application/vnd.github.v3+json"
-    dest: "/tmp/ge-proton_assets_response.json"
+    - name: Get assets (Proton-GE)
+      get_url:
+        url: "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest"
+        force: yes
+        headers:
+          Accept: "application/vnd.github.v3+json"
+        dest: "/tmp/ge-proton_assets_response.json"
 
-- name: Get download url (Proton-GE)
-  tags: *tags_proton_ge
-  shell: |
-    cat "/tmp/ge-proton_assets_response.json" | jq '.assets | .[] | select(.browser_download_url | contains(".tar.gz")) | .url' | sed -e 's/^"//' -e 's/"$//'
-  register: "download_url"
+    - name: Get download url (Proton-GE)
+      shell: |
+        cat "/tmp/ge-proton_assets_response.json" | jq '.assets | .[] | select(.browser_download_url | contains(".tar.gz")) | .url' | sed -e 's/^"//' -e 's/"$//'
+      register: "download_url"
 
-- name: Download latest release (Proton-GE)
-  tags: *tags_proton_ge
-  get_url:
-    url: "{{ download_url.stdout }}"
-    dest: /tmp/ge-proton-latest.tar.gz
-    tmp_dest: /tmp/
-    force: yes
-    headers:
-      Accept: "application/octet-stream"
+    - name: Download latest release (Proton-GE)
+      get_url:
+        url: "{{ download_url.stdout }}"
+        dest: /tmp/ge-proton-latest.tar.gz
+        tmp_dest: /tmp/
+        force: yes
+        headers:
+          Accept: "application/octet-stream"
 
-- name: Check if Proton-GE.tar.gz exists
-  tags: *tags_proton_ge
-  stat:
-    path: /tmp/ge-proton-latest.tar.gz
-  register: proton_ge
+    - name: Check if Proton-GE.tar.gz exists
+      stat:
+        path: /tmp/ge-proton-latest.tar.gz
+      register: proton_ge
 
-- name: Create Proton-GE dir
-  tags: *tags_proton_ge
-  ansible.builtin.file:
-    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.steam/debian-installation/compatibilitytools.d"
-    state: directory
-    mode: '0755'
+    - name: Create Proton-GE dir
+      ansible.builtin.file:
+        path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.steam/debian-installation/compatibilitytools.d"
+        state: directory
+        mode: '0755'
 
-- name: Check if Proton-GE dir exists
-  tags: *tags_proton_ge
-  stat:
-    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.steam/debian-installation/compatibilitytools.d"
-  register: proton_ge_dir
+    - name: Check if Proton-GE dir exists
+      stat:
+        path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.steam/debian-installation/compatibilitytools.d"
+      register: proton_ge_dir
 
-- name: Extract Proton-GE
-  tags: *tags_proton_ge
-  unarchive:
-      src: /tmp/ge-proton-latest.tar.gz
-      dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/.steam/debian-installation/compatibilitytools.d"
-  when: proton_ge.stat.exists and proton_ge_dir.stat.exists and proton_ge_dir.stat.isdir
+    - name: Extract Proton-GE
+      unarchive:
+          src: /tmp/ge-proton-latest.tar.gz
+          dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/.steam/debian-installation/compatibilitytools.d"
+      when: proton_ge.stat.exists and proton_ge_dir.stat.exists and proton_ge_dir.stat.isdir
 
-- name: Remove temp files (Proton-GE)
-  tags: *tags_proton_ge
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
-  with_items:
-    - /tmp/ge-proton_assets_response.json
-    - /tmp/ge-proton-latest.tar.gz
+    - name: Remove temp files (Proton-GE)
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /tmp/ge-proton_assets_response.json
+        - /tmp/ge-proton-latest.tar.gz
+
+    - name: Wine dependency hell
+
+    - name: Install protontricks
