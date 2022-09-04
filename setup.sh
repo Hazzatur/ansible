@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "${0%/*}" || exit
 export PATH=$HOME/.local/bin/:$PATH
 
 # TODO: Pending support for macOS and other distros
