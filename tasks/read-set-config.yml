@@ -14,7 +14,7 @@
         jsondata: "{{ result.stdout | from_json }}"
 
     # Apps
-    - name: Apps config
+    - name: Set apps config
       set_fact:
         cfg_apps: "{{ jsondata | json_query(jmesquery) }}"
       vars:
