@@ -51,21 +51,21 @@
 - name: Create Proton-GE dir
   tags: *tags_proton_ge
   ansible.builtin.file:
-    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.steam/root/compatibilitytools.d"
+    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.steam/debian-installation/compatibilitytools.d"
     state: directory
     mode: '0755'
 
 - name: Check if Proton-GE dir exists
   tags: *tags_proton_ge
   stat:
-    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.steam/root/compatibilitytools.d"
+    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.steam/debian-installation/compatibilitytools.d"
   register: proton_ge_dir
 
 - name: Extract Proton-GE
   tags: *tags_proton_ge
   unarchive:
       src: /tmp/ge-proton-latest.tar.gz
-      dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/.steam/root/compatibilitytools.d"
+      dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/.steam/debian-installation/compatibilitytools.d"
   when: proton_ge.stat.exists and proton_ge_dir.stat.exists and proton_ge_dir.stat.isdir
 
 - name: Remove temp files (Proton-GE)
