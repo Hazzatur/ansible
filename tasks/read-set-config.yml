@@ -1,52 +1,65 @@
-- name: Gather package facts
-  package_facts:
-    manager: apt
-
-- name: Reading config file
+- name: Configuration
   tags: &tags_read_config [ 'install', 'core' ]
-  shell: cat config.json
-  register: result
+  block:
+    - name: Gather package facts
+      package_facts:
+        manager: apt
 
-- name: Saving config file setting ...
-  tags: *tags_read_config
-  set_fact:
-    jsondata: "{{ result.stdout | from_json }}"
+    - name: Reading config file
+      shell: cat config.json
+      register: result
 
-- name: Gaming config
-  tags: *tags_read_config
-  set_fact:
-    cfg_gaming: "{{ jsondata | json_query(jmesquery) }}"
-  vars:
-    jmesquery: 'config.gaming'
+    - name: Set fact from config file
+      set_fact:
+        jsondata: "{{ result.stdout | from_json }}"
 
-- name: Steam config
-  tags: *tags_read_config
-  set_fact:
-    cfg_steam: "{{ jsondata | json_query(jmesquery) }}"
-  vars:
-    jmesquery: 'config.games.steam'
-  when: cfg_gaming == True
+    # Apps
+    - name: Apps config
+      set_fact:
+        cfg_apps: "{{ jsondata | json_query(jmesquery) }}"
+      vars:
+        jmesquery: 'config.apps'
 
-- name: Proton config
-  tags: *tags_read_config
-  set_fact:
-    cfg_proton: "{{ jsondata | json_query(jmesquery) }}"
-  vars:
-    jmesquery: 'config.games.proton'
-  when: cfg_gaming == True
+    - name: Read apps config
+      block:
+        - name: Opera config
+          set_fact:
+            cfg_opera: "{{ jsondata | json_query(jmesquery) }}"
+          vars:
+            jmesquery: 'config.appList.opera'
+      when: cfg_apps == True
 
-- name: Yuzu config
-  tags: *tags_read_config
-  set_fact:
-    cfg_yuzu: "{{ jsondata | json_query(jmesquery) }}"
-  vars:
-    jmesquery: 'config.games.yuzu'
-  when: cfg_gaming == True
+    # Gaming
+    - name: Set gaming config
+      set_fact:
+        cfg_gaming: "{{ jsondata | json_query(jmesquery) }}"
+      vars:
+        jmesquery: 'config.gaming'
 
-- name: RetroArch cofig
-  tags: *tags_read_config
-  set_fact:
-    cfg_retroArch: "{{ jsondata | json_query(jmesquery) }}"
-  vars:
-    jmesquery: 'config.games.retroArch'
-  when: cfg_gaming == True
+    - name: Read games & emulators config
+      block:
+        - name: Steam config
+          set_fact:
+            cfg_steam: "{{ jsondata | json_query(jmesquery) }}"
+          vars:
+            jmesquery: 'config.games.steam'
+      
+        - name: Proton config
+          set_fact:
+            cfg_proton: "{{ jsondata | json_query(jmesquery) }}"
+          vars:
+            jmesquery: 'config.games.proton'
+      
+        - name: Yuzu config
+          set_fact:
+            cfg_yuzu: "{{ jsondata | json_query(jmesquery) }}"
+          vars:
+            jmesquery: 'config.games.yuzu'
+      
+        - name: RetroArch cofig
+          set_fact:
+            cfg_retroArch: "{{ jsondata | json_query(jmesquery) }}"
+          vars:
+            jmesquery: 'config.games.retroArch'
+      when: cfg_gaming == True
+      
