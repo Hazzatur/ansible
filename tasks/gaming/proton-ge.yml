@@ -71,5 +71,8 @@
 - name: Remove temp files (Proton-GE)
   tags: *tags_proton_ge
   ansible.builtin.file:
-    path: /tmp/ge-proton*
+    path: "{{ item }}"
     state: absent
+  with_items:
+    - /tmp/ge-proton_assets_response.json
+    - /tmp/ge-proton-latest.tar.gz
