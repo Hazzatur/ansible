@@ -1,0 +1,52 @@
+- name: Gather package facts
+  package_facts:
+    manager: apt
+
+- name: Reading config file
+  tags: &tags_read_config [ 'install', 'core' ]
+  shell: cat config.json
+  register: result
+
+- name: Saving config file setting ...
+  tags: *tags_read_config
+  set_fact:
+    jsondata: "{{ result.stdout | from_json }}"
+
+- name: Gaming config
+  tags: *tags_read_config
+  set_fact:
+    cfg_gaming: "{{ jsondata | json_query(jmesquery) }}"
+  vars:
+    jmesquery: 'config.gaming'
+
+- name: Steam config
+  tags: *tags_read_config
+  set_fact:
+    cfg_steam: "{{ jsondata | json_query(jmesquery) }}"
+  vars:
+    jmesquery: 'config.games.steam'
+  when: cfg_gaming == True
+
+- name: Proton config
+  tags: *tags_read_config
+  set_fact:
+    cfg_proton: "{{ jsondata | json_query(jmesquery) }}"
+  vars:
+    jmesquery: 'config.games.proton'
+  when: cfg_gaming == True
+
+- name: Yuzu config
+  tags: *tags_read_config
+  set_fact:
+    cfg_yuzu: "{{ jsondata | json_query(jmesquery) }}"
+  vars:
+    jmesquery: 'config.games.yuzu'
+  when: cfg_gaming == True
+
+- name: RetroArch cofig
+  tags: *tags_read_config
+  set_fact:
+    cfg_retroArch: "{{ jsondata | json_query(jmesquery) }}"
+  vars:
+    jmesquery: 'config.games.retroArch'
+  when: cfg_gaming == True
