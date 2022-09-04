@@ -3,7 +3,7 @@
         "apps": true,
         "appList": {
             "opera": true
-        }
+        },
         "gaming": false,
         "games": {
             "steam": true,
