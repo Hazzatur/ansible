@@ -13,6 +13,8 @@
     # Read and set variables from config
     - include_tasks: tasks/read-set-config.yml
     # Core
+    - include_tasks: tasks/core/ssh.yml
+    # - include_tasks: tasks/core/dotfiles.yml
     # Apps
     - name: Opera browser
       include_tasks: tasks/apps/opera.yml
