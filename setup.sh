@@ -32,7 +32,7 @@ install_ansible(){
 
 run_playbook(){
     if command -v ansible &>/dev/null; then
-        ansible-playbook $TAGS main.yml --ask-become-pass
+        ansible-playbook $TAGS main.yml --ask-become-pass --ask-vault-pass
     else
         echo "Ansible not found"
     fi
