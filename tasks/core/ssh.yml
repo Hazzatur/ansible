@@ -20,14 +20,14 @@
         src: "{{ source_key }}"
         dest: "{{ dest_key }}"
         mode: 0600
-      when: ssh_dir.state.exists and ssh_dir.state.isdir
+      when: ssh_dir.stat.exists and ssh_dir.stat.isdir
 
     - name: Install ssh key public
       copy:
         src: "{{ source_key }}.pub"
         dest: "{{ dest_key }}.pub"
         mode: 0644
-      when: ssh_dir.state.exists and ssh_dir.state.isdir
+      when: ssh_dir.stat.exists and ssh_dir.stat.isdir
       
     - name: Check if key.pub exists
       stat:
@@ -43,4 +43,4 @@
         key: "{{ lookup('file', key) }}"
       with_fileglob:
         - "{{ lookup('ansible.builtin.env', 'HOME') }}/.ssh/*.pub"
-      when: ssh_pub.state.exists
+      when: ssh_pub.stat.exists
