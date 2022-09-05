@@ -1,0 +1,32 @@
+- name: Install .dotfiles
+  tags: &tags_dotfiles [ 'install', 'core', 'dotfiles' ]
+  block:
+    - name: Install stow
+      become: true
+      apt:
+        update_cache: yes
+        name: stow
+        
+    - name: Check if .ssh/id_rsa exists
+      stat:
+        path: "{{ lookup('env', 'HOME') }}/.ssh/id_rsa"
+      register: id_rsa
+      
+    - name: Clone .dotfiles
+      ansible.builtin.git:
+        repo: 'git@github.com:Hazzatur/.dotfiles.git'
+        dest: "{{ lookup('env', 'HOME') }}/.dotfiles"
+        recursive: yes
+        update: yes
+        accept_hostkey: yes
+        version: main
+      when: id_rsa.stat.exists
+      
+    - name: Check if .dotfiles dir exists
+      stat:
+        path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.dotfiles"
+      register: doftiles_dir
+        
+    - name: Stow .dotfiles
+      shell: cd $HOME/.dotfiles && ./stow.sh
+      when: doftiles_dir.stat.exists and doftiles_dir.stat.isdir
